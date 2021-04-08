@@ -1,30 +1,48 @@
 blueprint:
-  name: GE Switch Double Taps
-  description: Create automations to react to double taps from supporting GE switches.
+  name: GE Light Switch Double Taps with Auto Brightness
+  description: Auto-dim GE light switches that support double taps.
   domain: automation
 
   input:
     device:
-      name: Switch Device
-      description: A GE switch that supports double taps.
+      name: Light Switch Device
+      description: A GE light switch that supports double taps.
       selector:
         device:
           integration: zwave_js
           manufacturer: GE/Jasco
-
-    double_tap_on:
-      name: Double Tap On
-      description: Actions to run for a double tap on.
-      default: []
+          entity:
+            domain: light
+    
+    light:
+      name: Light Entity
+      description: The light entity to auto-dim, usually the entity associated with the device.
       selector:
-        action:
+        entity:
+          integration: zwave_js
+          domain: light
 
-    double_tap_off:
-      name: Double Tap Off
-      description: Actions to run for a double tap off.
-      default: []
+    off_brightness:
+      name: Off Brightness
+      description: The brightness to set for a double tap off.
+      default: 25
       selector:
-        action:
+        number:
+          min: 0
+          max: 100
+          unit_of_measurement: "%"
+          mode: slider
+
+    on_brightness:
+      name: On Brightness
+      description: The brightness to set for a double tap on.
+      default: 100
+      selector:
+        number:
+          min: 0
+          max: 100
+          unit_of_measurement: "%"
+          mode: slider
 
 mode: single
 max_exceeded: silent
@@ -41,6 +59,14 @@ action:
       value: "{{ trigger.event.data.value_raw }}"
   - choose:
     - conditions: "{{ value == 0 }}"
-      sequence: !input double_tap_off
+      sequence:
+        - service: light.turn_on
+          data:
+            entity_id: !input light
+            brightness_pct: !input off_brightness
     - conditions: "{{ value == 255 }}"
-      sequence: !input double_tap_on
+      sequence:
+        - service: light.turn_on
+          data:
+            entity_id: !input light
+            brightness_pct: !input on_brightness
