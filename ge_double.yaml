@@ -1,16 +1,16 @@
 blueprint:
-  name: GE Switch Double Taps
+  name: Honeywell Switch Double Taps
   description: Create automations to react to double taps from supporting GE switches.
   domain: automation
 
   input:
     device:
       name: Switch Device
-      description: A GE switch that supports double taps.
+      description: A Honeywell switch that supports double taps.
       selector:
         device:
           integration: zwave_js
-          manufacturer: GE/Jasco
+          manufacturer: Honeywell
 
     double_tap_on:
       name: Double Tap On
